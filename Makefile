@@ -6,11 +6,11 @@
 #    By: crystal <crystal@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/22 12:06:36 by jopfeiff          #+#    #+#              #
-#    Updated: 2024/07/31 17:42:06 by crystal          ###   ########.fr        #
+#    Updated: 2024/08/01 13:11:32 by crystal          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c process.c
+SRCS = main.c process.c utils.c
 CC = cc
 CFLAGS = -g3 -Wall -Wextra -Werror -I./includes/
 RM = rm -rf

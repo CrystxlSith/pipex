@@ -1,32 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: crystal <crystal@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/31 17:08:19 by crystal           #+#    #+#             */
-/*   Updated: 2024/08/04 15:40:30 by crystal          ###   ########.fr       */
+/*   Created: 2024/08/01 12:59:37 by crystal           #+#    #+#             */
+/*   Updated: 2024/08/01 13:22:07 by crystal          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/libft.h"
- #include <sys/types.h>
-#include <sys/wait.h>
+#include "pipex.h"
 
-typedef struct s_pipex
+int	open_fd(char *str)
 {
-	pid_t	pid;
-	int		pipefd[2];
-	int		file;
-	char	*env;
-	char	**args;
-	char	**paths;
-	
-	
-}t_pipex;
+	int file;
 
-int	child_process(t_pipex *pipex, char *argv[], char *env[]);
-int	parent_process(t_pipex *pipex, char *argv[], char *env[]);
-char	*ft_getenv(char *str, char *env[]);
-int	open_fd(char *str);
+	file = open(str, O_WRONLY | O_CREAT, 0777);
+	if (file == -1)
+		exit (2);
+	return (file);	
+}
