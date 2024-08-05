@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: crystal <crystal@student.42.fr>            +#+  +:+       +#+         #
+#    By: jopfeiff <jopfeiff@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/07/22 12:06:36 by jopfeiff          #+#    #+#              #
-#    Updated: 2024/08/01 13:11:32 by crystal          ###   ########.fr        #
+#    Updated: 2024/08/05 14:03:07 by jopfeiff         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,11 +29,6 @@ RESET  = \033[0m
 .SILENT:
 
 all: pipex 
-
-# so_long: $(NAME) $(OBJS)
-# 	echo "${CYAN}Compiling so_long...${RESET}"
-# 	cc so_long.a libft.a mlx/libmlx.a mlx/libmlx_Linux.a -lX11 -lXext -o so_long
-# 	echo "${GREEN}Succes!!!${RESET}"
 
 pipex: $(NAME) $(OBJS)
 	echo "${CYAN}Compiling pipex...${RESET}"
