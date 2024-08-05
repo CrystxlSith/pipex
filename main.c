@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: crystal <crystal@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jopfeiff <jopfeiff@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 12:04:59 by jopfeiff          #+#    #+#             */
-/*   Updated: 2024/08/03 12:53:29 by crystal          ###   ########.fr       */
+/*   Updated: 2024/08/05 17:34:51 by jopfeiff         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ int	main(int argc, char *argv[], char *env[])
 {
 	t_pipex pipex;
 
+
 	// init(pipex);
 	pipex.pid = fork();
 	// int i = 0;
@@ -36,6 +37,8 @@ int	main(int argc, char *argv[], char *env[])
 			ft_printf("Error: wrong number of arguments\n");
 			return (1);
 		}
+		pipex.infile = open(argv[1], O_WRONLY, 0777);
+		pipex.outfile = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 		if (pipex.pid == -1)
 		{
 			ft_printf("Error: fork failed\n");
@@ -44,8 +47,7 @@ int	main(int argc, char *argv[], char *env[])
 		if (pipex.pid == 0)
 			child_process(&pipex, argv, env);
 		else
-			parent_process(&pipex, argv, env);
-		
+				parent_process(&pipex, argv, env);
+			return 3;
 	}
-		// parent_process(argv);
 }

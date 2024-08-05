@@ -6,13 +6,13 @@
 /*   By: jopfeiff <jopfeiff@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:08:01 by crystal           #+#    #+#             */
-/*   Updated: 2024/08/05 15:02:32 by jopfeiff         ###   ########.fr       */
+/*   Updated: 2024/08/05 17:34:38 by jopfeiff         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void	exec(t_pipex *pipex)
+char	*exec(t_pipex *pipex)
 {
 	int	i;
 	char	*search;
@@ -21,28 +21,31 @@ void	exec(t_pipex *pipex)
 	i = 0;
 	while (pipex->paths[i])
 	{
-		search = ft_join_free(&pipex->paths[i], "/");
-		cmdpath = ft_join_free(&search, pipex->args[0]);
+		search = ft_strjoin(pipex->paths[i], "/");
+		cmdpath = ft_strjoin(search, pipex->args[0]);
+		free(search);
 		if (access(cmdpath, F_OK | X_OK) == 0)
 		{
-			pipex->exec = cmdpath;
-			break ;
+			return (cmdpath);
 		}
+		free(cmdpath);
 		i++;
 	}
-	return ;
+	return (NULL);
 }
 
 void	start(t_pipex *pipex, char *env[])
 {
-	exec(pipex);
-	if (!pipex->exec)
+	char *executable;
+	
+	executable = exec(pipex);
+	if (!executable)
 	{
 		ft_putstr_fd("i need a valid executable\n", 2);
 		exit(2);
 	}
-			printf("cmd path = %s", pipex->exec);
-	if (execve(pipex->exec, pipex->args, env) == -1)
+			// printf("cmd path = %s", pipex->exec);
+	if (execve(executable, pipex->args, env) == -1)
 	{
 		ft_putstr_fd("execution missed\n", 2);
 		exit(2);
@@ -82,9 +85,7 @@ int	child_process(t_pipex *pipex, char *argv[], char *env[])
 	pipex->args = ft_split(argv[2], ' ');
 	pipex->env = ft_getenv("PATH", env);
 	pipex->paths = ft_split(pipex->env, ':');
-	if (argv)
-		pipex->file = open_fd(pipex->args[1], pipex);
-	dup2(pipex->file, STDIN_FILENO);
+	dup2(pipex->infile, STDIN_FILENO);
 	dup2(pipex->pipefd[1], STDOUT_FILENO);
 	close(pipex->pipefd[0]);
 	start(pipex, env);
@@ -93,24 +94,15 @@ int	child_process(t_pipex *pipex, char *argv[], char *env[])
 
 int	parent_process(t_pipex *pipex, char *argv[], char *env[])
 {
-	// int i = 0;
 	if (!env)
 		exit(1);
-	// while (env[i])
-	// 
-	// 	ft_printf("%s\n", env[i]);
-	// 	i++;
-	// }
-	
 	pipex->args = ft_split(argv[3], ' ');
 	pipex->env = ft_getenv("PATH", env);
 	pipex->paths = ft_split(pipex->env, ':');
-	if (argv)
-		pipex->file = open_fd(pipex->args[4], pipex);
-	// ft_printf("%s\n", pipex->env);
-	dup2(pipex->file, STDOUT_FILENO);
+	dup2(pipex->outfile, STDOUT_FILENO);
 	dup2(pipex->pipefd[0], STDIN_FILENO);
 	close(pipex->pipefd[1]);
 	start(pipex, env);
+	// ft_printf("%s parent \n", pipex->env);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: jopfeiff <jopfeiff@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:08:19 by crystal           #+#    #+#             */
-/*   Updated: 2024/08/05 14:51:29 by jopfeiff         ###   ########.fr       */
+/*   Updated: 2024/08/05 17:31:38 by jopfeiff         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ typedef struct s_pipex
 	pid_t	pid;
 	int		pipefd[2];
 	int		file;
+	int		infile;
+	int		outfile;
 	char	*env;
 	char	*exec;
 	char	**args;
