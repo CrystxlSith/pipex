@@ -6,7 +6,7 @@
 /*   By: jopfeiff <jopfeiff@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:08:01 by crystal           #+#    #+#             */
-/*   Updated: 2024/08/08 15:04:55 by jopfeiff         ###   ########.fr       */
+/*   Updated: 2024/08/08 15:28:01 by jopfeiff         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,11 +86,6 @@ void	start(char *env[], char *cmd, t_pipex *pid)
 
 	args = ft_split(cmd, ' ');
 	executable_path = exec(args[0], env);
-	if (!executable_path)
-	{
-		ft_putstr_fd("i need a valid executable\n", 2);
-		exit(2);
-	}
 	if (pid->pid == 0)
 	{
 		if (execve(executable_path, args, env) == -1)
