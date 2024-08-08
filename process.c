@@ -6,7 +6,7 @@
 /*   By: jopfeiff <jopfeiff@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:08:01 by crystal           #+#    #+#             */
-/*   Updated: 2024/08/08 15:28:01 by jopfeiff         ###   ########.fr       */
+/*   Updated: 2024/08/08 17:01:25 by jopfeiff         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,92 +38,88 @@ char	*ft_getenv(char *str, char *env[])
 	return (NULL);
 }
 
-void	free_path(char **paths)
-{
-	int i;
-
-	i = 0;
-	while(paths[i])
-	{
-		free(paths[i]);
-		i++;
-	}
-	free(paths);
-}
-
-char	*exec(char *cmd, char **env) 
+char	*exec(t_pipex *pipex, char **cmd)
 {
 	int	i;
 	char	*search;
-	char	**base_cmd;
 	char	*cmdpath;
-	char	**getenv;
 
 	i = 0;
-	getenv = ft_split(ft_getenv("PATH", env), ':');
-	base_cmd = ft_split(cmd, ' ');
-	while (getenv[i])
+	while (pipex->paths[i])
 	{
-		search = ft_strjoin(getenv[i], "/");
-		cmdpath = ft_strjoin(search, base_cmd[0]);
+		search = ft_strjoin(pipex->paths[i], "/");
+		cmdpath = ft_strjoin(search, cmd[0]);
 		free(search);
 		if (access(cmdpath, F_OK | X_OK) == 0)
 		{
-			free_path(base_cmd);
 			return (cmdpath);
 		}
 		free(cmdpath);
 		i++;
 	}
-	// free_path(paths);
-	return (cmd);
+	return (NULL);
 }
 
-void	start(char *env[], char *cmd, t_pipex *pid)
+void	start(t_pipex *pipex, char *env[], char *cmd)
 {
-	char	**args;
-	char	*executable_path;
+	char *executable;
+	char	**base_cmd;
 
-	args = ft_split(cmd, ' ');
-	executable_path = exec(args[0], env);
-	if (pid->pid == 0)
+	pipex->env = ft_getenv("PATH", env);
+	pipex->paths = ft_split(pipex->env, ':');
+	base_cmd = ft_split(cmd, ' ');
+	executable = exec(pipex, base_cmd);
+	if (!executable)
 	{
-		if (execve(executable_path, args, env) == -1)
+		ft_putstr_fd("i need a valid executable\n", 2);
+		exit(2);
+	}
+	
+	if (pipex->pid == 0)
+	{
+		if (execve(executable, base_cmd, env) == -1)
 		{
-			// free_path(paths);
-			free(exec);
 			ft_putstr_fd("execution missed\n", 2);
-			exit(0);
+			exit(2);
 		}
 	}
 }
-
-
-int	child_process(char *argv[], char *env[], int *pipefd, t_pipex *pid)
+	
+int	child_process(t_pipex *pipex, char *argv[], char *env[])
 {
-	int infile;
+	int	infile;
 
-	infile = open(argv[1], O_RDONLY, 0777);
+	infile =  open(argv[1], O_RDONLY, 0777);
+	if (infile < 0)
+		perror("no infile");
 	if (!env)
 		exit(1);
-	dup2(infile, 0);
-	dup2(pipefd[1], 1);
-	close(pipefd[0]);
-	start(env, argv[2], pid);
+	if (dup2(infile, STDIN_FILENO) == -1) {
+		perror("Error with dup2 infile to STDIN");
+		exit(1);
+	}
+	dup2(pipex->pipefd[1], STDOUT_FILENO);
+	// close(pipex->pipefd[0]);
+	start(pipex, env, argv[2]);
+	// close(infile);
 	return (0);
 }
 
-int	parent_process(char *argv[], char *env[], int *pipefd, t_pipex *pid)
+int	parent_process(t_pipex *pipex, char *argv[], char *env[])
 {
 	int	outfile;
 
-	outfile = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	outfile = open(argv[4],O_CREAT | O_WRONLY | O_TRUNC, 0777);
+	if (outfile < 0)
+		perror("no outfile");
 	if (!env)
 		exit(1);
-	dup2(outfile, 1);
-	dup2(pipefd[0],0);
-	close(pipefd[1]);
-	start(env, argv[3], pid);
-	// ft_printf("%s parent \n", pipex->env);
+	pipex->env = ft_getenv("PATH", env);
+	pipex->paths = ft_split(pipex->env, ':');
+	dup2(outfile, STDOUT_FILENO);
+	dup2(pipex->pipefd[0], STDIN_FILENO);
+	// close(pipex->pipefd[1]);
+	start(pipex, env, argv[3]);
+	// close(outfile);
 	return (0);
 }
