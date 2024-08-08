@@ -6,51 +6,11 @@
 /*   By: jopfeiff <jopfeiff@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:08:01 by crystal           #+#    #+#             */
-/*   Updated: 2024/08/05 17:34:38 by jopfeiff         ###   ########.fr       */
+/*   Updated: 2024/08/08 13:38:47 by jopfeiff         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-char	*exec(t_pipex *pipex)
-{
-	int	i;
-	char	*search;
-	char	*cmdpath;
-
-	i = 0;
-	while (pipex->paths[i])
-	{
-		search = ft_strjoin(pipex->paths[i], "/");
-		cmdpath = ft_strjoin(search, pipex->args[0]);
-		free(search);
-		if (access(cmdpath, F_OK | X_OK) == 0)
-		{
-			return (cmdpath);
-		}
-		free(cmdpath);
-		i++;
-	}
-	return (NULL);
-}
-
-void	start(t_pipex *pipex, char *env[])
-{
-	char *executable;
-	
-	executable = exec(pipex);
-	if (!executable)
-	{
-		ft_putstr_fd("i need a valid executable\n", 2);
-		exit(2);
-	}
-			// printf("cmd path = %s", pipex->exec);
-	if (execve(executable, pipex->args, env) == -1)
-	{
-		ft_putstr_fd("execution missed\n", 2);
-		exit(2);
-	}
-}
 
 char	*ft_getenv(char *str, char *env[])
 {
@@ -78,31 +38,95 @@ char	*ft_getenv(char *str, char *env[])
 	return (NULL);
 }
 
-int	child_process(t_pipex *pipex, char *argv[], char *env[])
+void	free_path(char **paths)
 {
+	int i;
+
+	i = 0;
+	while(paths[i])
+	{
+		free(paths[i]);
+		i++;
+	}
+	free(paths);
+}
+
+char	*exec(char *cmd, char **env) 
+{
+	int	i;
+	char	*search;
+	char	**base_cmd;
+	char	*cmdpath;
+	char	**getenv;
+
+	i = 0;
+	getenv = ft_split(ft_getenv("PATH", env), ':');
+	base_cmd = ft_split(cmd, ' ');
+	while (getenv[i])
+	{
+		search = ft_strjoin(getenv[i], "/");
+		cmdpath = ft_strjoin(search, base_cmd[0]);
+		free(search);
+		if (access(cmdpath, F_OK | X_OK) == 0)
+		{
+			free_path(base_cmd);
+			return (cmdpath);
+		}
+		free(cmdpath);
+		i++;
+	}
+	// free_path(paths);
+	return (NULL);
+}
+
+void	start(char *env[], char *cmd)
+{
+	char	**args;
+	char	*executable_path;
+
+	args = ft_split(cmd, ' ');
+	executable_path = exec(args[0], env);
+	if (!executable_path)
+	{
+		ft_putstr_fd("i need a valid executable\n", 2);
+		exit(2);
+	}
+	ft_printf("%s\n", args[1]);
+	// if (execve(executable_path, args, env) == -1)
+	// {
+	// 	// free_path(paths);
+	// 	free(exec);
+	// 	ft_putstr_fd("execution missed\n", 2);
+	// 	exit(0);
+	// }
+}
+
+
+int	child_process(char *argv[], char *env[], int *pipefd)
+{
+	int infile;
+
+	infile = open(argv[1], O_RDONLY, 0777);
 	if (!env)
 		exit(1);
-	pipex->args = ft_split(argv[2], ' ');
-	pipex->env = ft_getenv("PATH", env);
-	pipex->paths = ft_split(pipex->env, ':');
-	dup2(pipex->infile, STDIN_FILENO);
-	dup2(pipex->pipefd[1], STDOUT_FILENO);
-	close(pipex->pipefd[0]);
-	start(pipex, env);
+	dup2(infile, 0);
+	dup2(pipefd[1], 1);
+	close(pipefd[0]);
+	start(env, argv[2]);
 	return (0);
 }
 
-int	parent_process(t_pipex *pipex, char *argv[], char *env[])
+int	parent_process(char *argv[], char *env[], int *pipefd)
 {
+	int	outfile;
+
+	outfile = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (!env)
 		exit(1);
-	pipex->args = ft_split(argv[3], ' ');
-	pipex->env = ft_getenv("PATH", env);
-	pipex->paths = ft_split(pipex->env, ':');
-	dup2(pipex->outfile, STDOUT_FILENO);
-	dup2(pipex->pipefd[0], STDIN_FILENO);
-	close(pipex->pipefd[1]);
-	start(pipex, env);
+	dup2(outfile, 1);
+	dup2(pipefd[0],0);
+	close(pipefd[1]);
+	start(env, argv[3]);
 	// ft_printf("%s parent \n", pipex->env);
 	return (0);
 }
