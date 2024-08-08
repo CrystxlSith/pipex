@@ -6,7 +6,7 @@
 /*   By: jopfeiff <jopfeiff@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 12:04:59 by jopfeiff          #+#    #+#             */
-/*   Updated: 2024/08/08 13:33:37 by jopfeiff         ###   ########.fr       */
+/*   Updated: 2024/08/08 15:02:51 by jopfeiff         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,12 @@ void	init(t_pipex *pipex)
 
 int	main(int argc, char *argv[], char *env[])
 {
-	int	pid;
+	t_pipex	pid;
 	int pipefd[2];
 
 
 	// init(pipex);
-	pid = fork();
+	pid.pid = fork();
 	// int i = 0;
 	if (argv[1])
 	{
@@ -35,12 +35,12 @@ int	main(int argc, char *argv[], char *env[])
 			return (2); 
 		if (argc != 5)
 			return (1);
-		if (pid == -1)
+		if (pid.pid == -1)
 			return (2);
-		if (pid == 0)
-			child_process(argv, env, pipefd);
+		if (pid.pid == 0)
+			child_process(argv, env, pipefd, &pid);
 		else
-			parent_process(argv, env, pipefd);
+			parent_process(argv, env, pipefd, &pid);
 		return 3;
 	}
 }

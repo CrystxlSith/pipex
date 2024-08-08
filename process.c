@@ -6,7 +6,7 @@
 /*   By: jopfeiff <jopfeiff@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:08:01 by crystal           #+#    #+#             */
-/*   Updated: 2024/08/08 13:38:47 by jopfeiff         ###   ########.fr       */
+/*   Updated: 2024/08/08 15:04:55 by jopfeiff         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,10 +76,10 @@ char	*exec(char *cmd, char **env)
 		i++;
 	}
 	// free_path(paths);
-	return (NULL);
+	return (cmd);
 }
 
-void	start(char *env[], char *cmd)
+void	start(char *env[], char *cmd, t_pipex *pid)
 {
 	char	**args;
 	char	*executable_path;
@@ -91,18 +91,20 @@ void	start(char *env[], char *cmd)
 		ft_putstr_fd("i need a valid executable\n", 2);
 		exit(2);
 	}
-	ft_printf("%s\n", args[1]);
-	// if (execve(executable_path, args, env) == -1)
-	// {
-	// 	// free_path(paths);
-	// 	free(exec);
-	// 	ft_putstr_fd("execution missed\n", 2);
-	// 	exit(0);
-	// }
+	if (pid->pid == 0)
+	{
+		if (execve(executable_path, args, env) == -1)
+		{
+			// free_path(paths);
+			free(exec);
+			ft_putstr_fd("execution missed\n", 2);
+			exit(0);
+		}
+	}
 }
 
 
-int	child_process(char *argv[], char *env[], int *pipefd)
+int	child_process(char *argv[], char *env[], int *pipefd, t_pipex *pid)
 {
 	int infile;
 
@@ -112,11 +114,11 @@ int	child_process(char *argv[], char *env[], int *pipefd)
 	dup2(infile, 0);
 	dup2(pipefd[1], 1);
 	close(pipefd[0]);
-	start(env, argv[2]);
+	start(env, argv[2], pid);
 	return (0);
 }
 
-int	parent_process(char *argv[], char *env[], int *pipefd)
+int	parent_process(char *argv[], char *env[], int *pipefd, t_pipex *pid)
 {
 	int	outfile;
 
@@ -126,7 +128,7 @@ int	parent_process(char *argv[], char *env[], int *pipefd)
 	dup2(outfile, 1);
 	dup2(pipefd[0],0);
 	close(pipefd[1]);
-	start(env, argv[3]);
+	start(env, argv[3], pid);
 	// ft_printf("%s parent \n", pipex->env);
 	return (0);
 }
