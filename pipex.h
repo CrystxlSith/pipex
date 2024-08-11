@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jopfeiff <jopfeiff@student.42.fr>          +#+  +:+       +#+        */
+/*   By: crystal <crystal@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 17:08:19 by crystal           #+#    #+#             */
-/*   Updated: 2024/08/08 15:02:01 by jopfeiff         ###   ########.fr       */
+/*   Updated: 2024/08/11 15:43:06 by crystal          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 typedef struct s_pipex
 {
 	pid_t	pid;
+	pid_t	pid2;
 	int		pipefd[2];
 	int		file;
 	char	*env;
@@ -27,8 +28,8 @@ typedef struct s_pipex
 	
 }t_pipex;
 
-int	child_process(char *argv[], char *env[], int *pipefd, t_pipex *pid);
+int	child_process(t_pipex *pipex, char *argv[], char *env[]);
 char	*ft_join_free(char **s1, const char *s2);
-int	parent_process(char *argv[], char *env[], int *pipefd, t_pipex *pid);
+int	parent_process(t_pipex *pipex, char *argv[], char *env[]);
 char	*ft_getenv(char *str, char *env[]);
 int	open_fd(char *str, t_pipex *pipex);
