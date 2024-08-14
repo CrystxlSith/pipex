@@ -1,4 +1,4 @@
-SRCS = main.c
+SRCS = main.c process.c error_free.c
 CC = cc
 CFLAGS = -g3 -Wall -Wextra -Werror -I./includes/
 RM = rm -rf
@@ -31,6 +31,7 @@ clean:
 	$(MAKE) clean --no-print-directory -C ./libft
 	$(RM) $(OBJS) objs
 	$(RM) libft.a
+	$(RM) pipex
 	echo "${GREEN}Succes!!!${RESET}"
 	
 fclean: clean
