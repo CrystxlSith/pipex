@@ -6,7 +6,7 @@
 /*   By: jopfeiff <jopfeiff@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 12:12:33 by jopfeiff          #+#    #+#             */
-/*   Updated: 2024/08/14 14:38:27 by jopfeiff         ###   ########.fr       */
+/*   Updated: 2024/08/23 09:56:12 by jopfeiff         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,4 +75,4 @@ void	child(char *env[], char *argv[], t_pipex pipex)
 		error_mess("Error : command not found");
 	}
 	execve(pipex.cmd, pipex.cmd_args, env);
-}	
+}

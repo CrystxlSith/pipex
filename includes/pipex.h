@@ -6,7 +6,7 @@
 /*   By: jopfeiff <jopfeiff@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/11 16:23:07 by crystal           #+#    #+#             */
-/*   Updated: 2024/08/14 15:02:55 by jopfeiff         ###   ########.fr       */
+/*   Updated: 2024/08/23 09:56:26 by jopfeiff         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ typedef struct s_pipex
 	char	*cmd;
 	char	**cmd_args;
 	char	**cmd_paths;
-}t_pipex;
+}	t_pipex;
 
 /*			ERROR_FREE			*/
 
